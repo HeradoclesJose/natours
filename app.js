@@ -4,7 +4,7 @@ const path = require("path");
 const morgan = require("morgan");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
-const helmet = require("helmet");
+// const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
@@ -46,9 +46,9 @@ app.options("*", cors());
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
 // Set security http headers
-app.use(helmet());
-// Enable if you are behind a reverse proxy
-app.set("trust proxy", 1);
+// app.use(helmet());
+// // Enable if you are behind a reverse proxy
+// app.set("trust proxy", 1);
 // Limit requests to API
 app.use("/api", limiter);
 // Body parser, reading data from body into req.body
