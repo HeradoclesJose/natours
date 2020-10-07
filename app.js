@@ -4,7 +4,7 @@ const path = require("path");
 const morgan = require("morgan");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
-// const helmet = require("helmet");
+const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
@@ -21,44 +21,50 @@ const reviewRouter = require("./routes/reviewRoutes");
 const viewRouter = require("./routes/viewRoutes");
 const bookingRouter = require("./routes/bookingRoutes");
 
-// Express variables
+// Start express app
 const app = express();
 
-// Global middlewares
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
-
-// Rate limiter
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 15 * 60 * 1000,
-  message: "Too many request from this IP, please try again in an hour",
-  statusCode: 429,
-});
+app.enable("trust proxy");
 
 // Set pug as default view engine
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
-// CORS
+
+// 1) GLOBAL MIDDLEWARES
+// Implement CORS
 app.use(cors());
 app.options("*", cors());
+
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
-// Set security http headers
-// app.use(helmet());
-// // Enable if you are behind a reverse proxy
-// app.set("trust proxy", 1);
-// Limit requests to API
+
+// Set security HTTP headers
+app.use(helmet());
+
+// Development logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// Limit requests from same API
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many requests from this IP, please try again in an hour!",
+});
 app.use("/api", limiter);
+
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
-// Cookie parser, reads data from cookies
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
-// Data sanitization against NoSQL query Injection
+
+// Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
+
 // Data sanitization against XSS
 app.use(xss());
+
 // Prevent parameter pollution
 app.use(
   hpp({
@@ -75,8 +81,10 @@ app.use(
 
 app.use(compression());
 
+// Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  // console.log(req.cookies);
   next();
 });
 
