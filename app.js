@@ -4,8 +4,7 @@ const path = require("path");
 const morgan = require("morgan");
 const express = require("express");
 const rateLimit = require("express-rate-limit");
-// FIXME: TURN THIS ON WHEN YOU HAVE SSL
-// const helmet = require("helmet");
+const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
@@ -42,8 +41,7 @@ app.set("views", path.join(__dirname, "views"));
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
 // Set security http headers
-// FIXME: TURN THIS ON WHEN YOU HAVE SSL
-// app.use(helmet());
+app.use(helmet());
 // Enable if you are behind a reverse proxy
 // app.set("trust proxy", 1);
 // Limit requests to API
