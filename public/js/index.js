@@ -20,8 +20,6 @@ if (mapBox) {
 }
 
 if (loginForm) {
-  console.log("heeere");
-  console.log(email, password);
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value;
