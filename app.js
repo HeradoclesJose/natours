@@ -28,6 +28,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+// Rate limiter
 const limiter = rateLimit({
   max: 100,
   windowMs: 15 * 60 * 1000,
