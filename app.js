@@ -10,6 +10,7 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
+const cors = require("cors");
 // Dev packages
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -39,12 +40,15 @@ const limiter = rateLimit({
 // Set pug as default view engine
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
+// CORS
+app.use(cors());
+app.options("*", cors());
 // Serving static files
 app.use(express.static(path.join(__dirname, "public")));
 // Set security http headers
 app.use(helmet());
 // Enable if you are behind a reverse proxy
-// app.set("trust proxy", 1);
+app.set("trust proxy", 1);
 // Limit requests to API
 app.use("/api", limiter);
 // Body parser, reading data from body into req.body
