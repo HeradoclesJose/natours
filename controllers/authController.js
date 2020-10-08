@@ -16,7 +16,7 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, statusCode, req, res) => {
+const createSendToken = (user, statusCode, res, req) => {
   const token = signToken(user._id);
 
   res.cookie("jwt", token, {
@@ -24,7 +24,7 @@ const createSendToken = (user, statusCode, req, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    secure: req.secure,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
   });
 
   // Remove password from output
@@ -143,13 +143,10 @@ exports.isLoggedIn = async (req, res, next) => {
 
 exports.logout = (req, res) => {
   res.cookie("jwt", "loggedout", {
-    expires: new Date(Date.now * 10 * 1000),
+    expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
-
-  res.status(200).json({
-    status: "success",
-  });
+  res.status(200).json({ status: "success" });
 };
 
 exports.restrictTo = (...roles) => {
