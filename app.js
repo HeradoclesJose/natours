@@ -14,6 +14,7 @@ const cors = require("cors");
 // Dev packages
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
+const bookingController = require("./controllers/bookingController");
 // Routers
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -53,6 +54,13 @@ const limiter = rateLimit({
   message: "Too many requests from this IP, please try again in an hour!",
 });
 app.use("/api", limiter);
+
+// BEFORE BODY PARSER, Stripe needs the body in a raw format
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  bookingController.webhookCheckout
+);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
